@@ -8,7 +8,7 @@ import UIKit
 import SpriteKit
 import Vision
 
-class GameViewController: UIViewController,UINavigationControllerDelegate,UIImagePickerControllerDelegate  {
+class GameViewController: UIViewController,UINavigationControllerDelegate,CameraViewControllerDelegate  {
     
     @IBOutlet weak var skView: SKView!
     
@@ -37,27 +37,43 @@ class GameViewController: UIViewController,UINavigationControllerDelegate,UIImag
     
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let imagePicker = UIImagePickerController()
-        imagePicker.delegate = self
-        imagePicker.sourceType = .camera
-        present(imagePicker,animated: true)
+        
+        let cameraViewController = CameraViewController()
+        cameraViewController.delegate = self
+        
+//        scene.add(image: image)
+        
+        present(cameraViewController,animated: true)
+       
+    }
+    func didCapturePhoto(_ image: UIImage) {
+        scene.add(image: image)
+        count = count + 1
+        if count % 2 == 0{
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0){
+                self.scene.addBoard()
+            }
+        }
     }
    
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let image = info[.originalImage] as? UIImage{
-            let image = try! ImageSegmenter.getForegroundImage(from: image)
-            scene.add(image: image)
-            count = count + 1
-            if count % 2 == 0{
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0){
-                    self.scene.addBoard()
-//                    self.count
-                }
-            }
-        }
-        picker.dismiss(animated: true)
-    }
+//    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+//        if let image = info[.originalImage] as? UIImage{
+//            print("test")
+//            let image = try! ImageSegmenter.getForegroundImage(from: image)
+//            scene.add(image: image)
+//            count = count + 1
+//            if count % 2 == 0{
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0){
+//                    self.scene.addBoard()
+////                    self.count
+//                }
+//            }
+//        } else {
+//            print("testsssss")
+//        }
+//        picker.dismiss(animated: true)
+//    }
     
 
    

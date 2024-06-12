@@ -8,6 +8,10 @@
 import UIKit
 import AVFoundation
 
+protocol CameraViewControllerDelegate: AnyObject{
+    func didCapturePhoto(_ image:UIImage)
+}
+
 class CameraViewController: UIViewController,AVCapturePhotoCaptureDelegate {
     
     var captureSession: AVCaptureSession!
@@ -16,6 +20,7 @@ class CameraViewController: UIViewController,AVCapturePhotoCaptureDelegate {
         var timerLabel: UILabel!
         var countdownTimer: Timer!
         var countdown: Int = 3
+    weak var delegate: CameraViewControllerDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -109,6 +114,12 @@ class CameraViewController: UIViewController,AVCapturePhotoCaptureDelegate {
             guard let image = UIImage(data: imageData) else {
                 print("写真データをUIImageに変換できませんでした。")
                 return
+            }
+            do{
+                let segmentedImage = try ImageSegmenter.getForegroundImage(from: image)
+                delegate?.didCapturePhoto(segmentedImage)
+            }catch{
+                print()
             }
             
 //            UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
